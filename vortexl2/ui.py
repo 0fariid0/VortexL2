@@ -8,7 +8,7 @@ import os
 import sys
 import re
 import hashlib
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 try:
     from rich.console import Console
@@ -240,7 +240,7 @@ def prompt_tunnel_side() -> Optional[str]:
 
 def tunnel_seed(name: str) -> int:
     return abs(hash(name)) % 4096
-def suggest_interface_ips(interface_index: int, side: str) -> tuple[str, str]:
+def suggest_interface_ips(interface_index: int, side: str) -> Tuple[str, str]:
     """Suggest a unique /30 pair for this tunnel index.
 
     We allocate from 10.30.0.0/16 in /30 blocks:
@@ -259,7 +259,7 @@ def suggest_interface_ips(interface_index: int, side: str) -> tuple[str, str]:
     else:  # KHAREJ
         return f"{ip2}/30", ip1
 
-def suggest_ids(interface_index: int, side: str) -> tuple[int, int, int, int]:
+def suggest_ids(interface_index: int, side: str) -> Tuple[int, int, int, int]:
     """Suggest unique (tunnel_id, peer_tunnel_id, session_id, peer_session_id)."""
     base_tunnel = 1000 + (interface_index * 100)
     iran_tid, kharej_tid = base_tunnel, base_tunnel + 1000
