@@ -1,0 +1,15 @@
+[Unit]
+Description=VortexL2 L2TPv3 Tunnel Setup
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/iliya-Developer/VortexL2
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/vortexl2 apply
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
