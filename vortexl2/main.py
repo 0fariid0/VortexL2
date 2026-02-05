@@ -247,15 +247,6 @@ def handle_forwards_menu(manager: ConfigManager):
             success, msg = forward.start_all_forwards()
             ui.show_output(msg, "Start Forwards")
             ui.wait_for_enter()
-        elif choice == "7":
-            # Change tunnel
-            new_config = ui.prompt_select_tunnel_for_forwards(manager)
-            if not new_config:
-                continue
-            config = new_config
-            forward = ForwardManager(config)
-            ui.show_info(f"Switched to tunnel '{config.name}'")
-            ui.wait_for_enter()
 
 
 def handle_logs(manager: ConfigManager):

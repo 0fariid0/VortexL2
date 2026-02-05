@@ -8,7 +8,7 @@ import os
 import sys
 import re
 import hashlib
-from typing import Optional, List, Tuple
+from typing import Optional, List
 
 try:
     from rich.console import Console
@@ -129,7 +129,6 @@ def show_forwards_menu() -> str:
         ("4", "Restart All Forwards"),
         ("5", "Stop All Forwards"),
         ("6", "Start All Forwards"),
-        ("7", "Change Tunnel"),
         ("0", "Back to Main Menu"),
     ]
     
@@ -240,14 +239,8 @@ def prompt_tunnel_side() -> Optional[str]:
 
 
 def tunnel_seed(name: str) -> int:
-    """Deterministic numeric seed from tunnel name.
-
-    NOTE: Python's built-in hash() is randomized per-process on many systems,
-    so we use sha256 to keep the same defaults on both IRAN and KHAREJ.
-    """
-    h = hashlib.sha256(name.encode('utf-8')).hexdigest()
-    return int(h[:8], 16) % 4096
-def suggest_interface_ips(interface_index: int, side: str) -> Tuple[str, str]:
+    return abs(hash(name)) % 4096
+def suggest_interface_ips(interface_index: int, side: str) -> tuple[str, str]:
     """Suggest a unique /30 pair for this tunnel index.
 
     We allocate from 10.30.0.0/16 in /30 blocks:
@@ -266,7 +259,7 @@ def suggest_interface_ips(interface_index: int, side: str) -> Tuple[str, str]:
     else:  # KHAREJ
         return f"{ip2}/30", ip1
 
-def suggest_ids(interface_index: int, side: str) -> Tuple[int, int, int, int]:
+def suggest_ids(interface_index: int, side: str) -> tuple[int, int, int, int]:
     """Suggest unique (tunnel_id, peer_tunnel_id, session_id, peer_session_id)."""
     base_tunnel = 1000 + (interface_index * 100)
     iran_tid, kharej_tid = base_tunnel, base_tunnel + 1000
@@ -420,30 +413,23 @@ def prompt_ports() -> str:
 
 
 def prompt_select_tunnel_for_forwards(manager: ConfigManager) -> Optional[TunnelConfig]:
-    """Prompt to select a tunnel for port forwarding.
-
-    Always asks which tunnel to use (even if only one), so forwarded ports are
-    clearly associated with a specific tunnel.
-    """
+    """Prompt to select a tunnel for port forwarding."""
     tunnels = manager.get_all_tunnels()
-
+    
     if not tunnels:
         console.print("[yellow]No tunnels available. Create one first.[/]")
         return None
-
-    console.print()
-    console.print("[bold white]Select tunnel for port forwards:[/]")
+    
+    if len(tunnels) == 1:
+        return tunnels[0]
+    
+    console.print("\n[bold white]Select tunnel for port forwards:[/]")
     for i, tunnel in enumerate(tunnels, 1):
         console.print(f"  [bold cyan][{i}][/] {tunnel.name}")
-    console.print("  [bold cyan][0][/] Cancel")
-
-    choice = Prompt.ask("[bold cyan]Select tunnel[/]", default="1").strip()
-
-    # Allow entering the tunnel name directly
-    for t in tunnels:
-        if choice.lower() == t.name.lower():
-            return t
-
+    console.print(f"  [bold cyan][0][/] Cancel")
+    
+    choice = Prompt.ask("\n[bold cyan]Select tunnel[/]", default="1")
+    
     try:
         idx = int(choice)
         if idx == 0:
@@ -452,7 +438,7 @@ def prompt_select_tunnel_for_forwards(manager: ConfigManager) -> Optional[Tunnel
             return tunnels[idx - 1]
     except ValueError:
         pass
-
+    
     console.print("[red]Invalid selection[/]")
     return None
 
