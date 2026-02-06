@@ -20,7 +20,7 @@ INSTALL_DIR="/opt/vortexl2"
 BIN_PATH="/usr/local/bin/vortexl2"
 SYSTEMD_DIR="/etc/systemd/system"
 CONFIG_DIR="/etc/vortexl2"
-REPO_URL="https://github.com/iliya-Developer/VortexL2.git"
+REPO_URL="https://github.com/0fariid0/VortexL2.git"
 REPO_BRANCH="main"
 
 echo -e "${CYAN}"
